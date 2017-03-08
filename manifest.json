@@ -1,0 +1,42 @@
+{
+  "manifest_version": 2,
+
+  "name": "multisearch",
+  "description": "With this extension you can search for multiple strings on a website.",
+  "version": "0.1",
+
+  "commands": {
+    "toggle-feature-foo": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Toggle feature foo"
+    },
+    "_execute_browser_action": {
+      "suggested_key": {
+        "windows": "Alt+F",
+        "mac": "Alt+F",
+        "chromeos": "Alt+F",
+        "linux": "Alt+F"
+      }
+    }
+  },
+
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "https://ajax.googleapis.com/"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+	  "css": ["style.css"],
+      "js": ["findAndReplaceDOMText.js", "main.js"]
+    }
+  ]
+}
