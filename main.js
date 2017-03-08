@@ -1,10 +1,13 @@
 var timeouts = {};
+var searchTerms = {}; // SearchTerms are stored here because popup loses state after closing
 
 chrome.runtime.onConnect.addListener(function(port) {
-  port.onMessage.addListener(function(msg) {
 
+  port.postMessage({searchTerms: searchTerms}); // Send stored terms afrer connection
+
+  port.onMessage.addListener(function(msg) {
     function updateHighlights() {
-      console.log('RECEIVED MESSAGE: ' + msg.searchTermInputId + ' - ' + msg.searchTerm);
+      searchTerms[msg.searchTermInputId] = msg.searchTerm;
       removeHighlights(msg.searchTermInputId);
       highlightSearchTerm(msg.searchTermInputId, msg.searchTerm);
     }
@@ -14,8 +17,8 @@ chrome.runtime.onConnect.addListener(function(port) {
       timeouts[msg.searchTermInputId] = 0;
     }
     timeouts[msg.searchTermInputId] = setTimeout(updateHighlights, 1000);
-
   });
+
 });
 
 function highlightSearchTerm (searchTermInputId, searchTerm) {

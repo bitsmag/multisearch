@@ -26,10 +26,11 @@ function isLastInput (id) {
 	return isLast;
 }
 
-function addNewInput (id) {
+function addNewInput (id, value) {
 	var inputNode = document.createElement('input');
 	inputNode.type = 'text';
 	inputNode.id = 'searchTermInput-' + id;
+  inputNode.value = value;
 	document.getElementById('searchTermsForm').appendChild(inputNode);
 }
 
@@ -40,7 +41,7 @@ function addChangeListener (numberId) {
       searchTermInput.addEventListener('input', function(){
         port.postMessage({searchTermInputId: searchTermInput.id, searchTerm: searchTermInput.value});
         if (isLastInput(numberId)) {
-          addNewInput(numberId+1);
+          addNewInput(numberId+1, null);
           addChangeListener(numberId+1);
         }
       });
@@ -49,8 +50,20 @@ function addChangeListener (numberId) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+
 	getTabId(function(tabId){
 		port = chrome.tabs.connect(tabId, {name: 'multisearch'});
+
+    port.onMessage.addListener(function(msg) { // After connect main.js sends stored searchTerms
+      var i = 0;
+      do {
+        searchTerm = msg.searchTerms['searchTermInput-'+i] ? msg.searchTerms['searchTermInput-'+i] : null;
+        addNewInput(i, searchTerm);
+        addChangeListener(i);
+        i++;
+      }
+      while (msg.searchTerms['searchTermInput-'+i]);
+    });
 	});
-	addChangeListener(0);
+
 });
